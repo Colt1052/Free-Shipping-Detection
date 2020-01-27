@@ -1,0 +1,3 @@
+Image segmentation to seperate probable objects from the backround
+searching for the qr code in probable objects to gain certainty
+combination of edge detection and region detection for all color channels
