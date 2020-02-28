@@ -46,7 +46,10 @@ class StartWindow(QMainWindow):
         self.image_view.setPixmap(QPixmap.fromImage(Img))
 
     def stop_feed(self):
-        self.video_thread.paused = True
+        if not self.video_thread.paused:
+            self.video_thread.paused = True
+        else:
+            self.video_thread = None
 
         #self.image_view.setImage(frame.T)
     def update_movie(self):
@@ -58,9 +61,10 @@ class StartWindow(QMainWindow):
         self.image_view.setPixmap(QPixmap.fromImage(Img))
 
     def start_video(self):
+        #if not self.video_thread:
         self.video_thread = VideoThread(self.grabber,self.image_view)
         self.video_thread.start()
-        #self.update_timer.start(30)
+            #self.update_timer.start(30)
 
 
 class VideoThread(QThread):
@@ -77,7 +81,7 @@ class VideoThread(QThread):
 
 
     def update_image(self):
-        frame = self.grabber.get_frame(0.2)
+        frame = self.grabber.get_frame()
         height, width, channel = frame.shape
         bytesPerLine = 3 * width
         Img = QImage(frame.data, width, height, bytesPerLine, QImage.Format_RGB888)
