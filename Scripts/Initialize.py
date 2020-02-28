@@ -22,11 +22,12 @@ while (arguments >= position):
 
 
 
-#grabber = Camera(0)
-grabber = Video("C:/Users/colto/Desktop/Free-Shipping-Detection/Videos/MP4/First Drone Flight Showing Jello Effect Of Vibrations On Camera.mp4")
+grabber = Camera(0)
+#grabber = Video("C:/Users/colto/Desktop/Free-Shipping-Detection/Videos/MP4/First Drone Flight Showing Jello Effect Of Vibrations On Camera.mp4")
 grabber.initialize()
 
 finder = Finder(grabber)
+
 
 while True:
     finder.Finding()

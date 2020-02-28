@@ -5,6 +5,8 @@ import scipy
 from matplotlib import pyplot as plt
 import numpy as np
 import time
+import glob
+import math
 
 (major_ver, minor_ver, subminor_ver) = (cv2.__version__).split('.')
 
@@ -77,11 +79,13 @@ class Detector:
 
 class Finder:
     def __init__(self,grabber):
+
         self.trackable_objects = []
         self.video_grabber = grabber
         self.initVideo()
         self.thresh = 0
         self.lastFrame = np.zeros(1)
+        self.image_list = glob.iglob("C:/Users/cv036542/Desktop/Free-Shipping-Detection/Images/*")
 
 
 
@@ -95,6 +99,49 @@ class Finder:
     def Finding(self):
 
         k = cv2.waitKey(1)
+
+        for image in self.image_list:
+            img = cv2.imread(image,cv2.IMREAD_GRAYSCALE)
+            displaced = cv2.imread(image,cv2.IMREAD_GRAYSCALE)
+            count = 0
+            print(type(displaced))
+            for line in displaced:
+                #print("before")
+                #print(line)
+                disp = 10*math.sin(count/16) + 1
+                if int(disp) < 0:
+                    for shift_num in range(abs(int(disp))):
+                        #print("before")
+                        #print(line)
+                        line = np.delete(line,0)
+                        #print("after")
+                        #print(line)
+                        line = np.append(line,255)
+                else:
+                    for shift_num in range(abs(int(disp))):
+                        line = np.insert(line,0,255)
+                        line = np.delete(line,line.size-2)
+                #print("after")
+                #print(line)
+                displaced[count] = line
+                count = count+1
+            fourier = np.fft.fft2(img)
+            fshift = np.fft.fftshift(fourier)
+            magnitude_spectrum = 20 * np.log(np.abs(fshift))
+            magnitude_spectrum = np.asarray(magnitude_spectrum, dtype=np.uint8)
+
+            fourier_disp = np.fft.fft2(displaced)
+            fshift_disp = np.fft.fftshift(fourier_disp)
+            magnitude_spectrum_disp = 20 * np.log(np.abs(fshift_disp))
+            magnitude_spectrum_disp = np.asarray(magnitude_spectrum_disp, dtype=np.uint8)
+
+            image_and_magnitude = np.concatenate((img,magnitude_spectrum),axis = 1)
+            image_and_magnitude_disp = np.concatenate((displaced,magnitude_spectrum_disp),axis = 1)
+            combined = np.concatenate((image_and_magnitude,image_and_magnitude_disp), axis = 0)
+            resized = cv2.resize(combined,(int(combined.shape[0]/2),int(combined.shape[1]/2)))
+            cv2.imshow(image,resized)
+
+
         #print(k)
         if k == 122 or not self.thresh == 0 and self.thresh < 255 and not k == 120:
             print(self.thresh)

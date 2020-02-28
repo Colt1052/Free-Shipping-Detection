@@ -28,6 +28,12 @@ class Camera:
         self.last_frame_time = time.time()
         return ret,scaled
 
+    def getLastFrame(self, scale=1):
+        scaled = self.last_frame
+        if not scale == 1:
+            scaled = cv2.resize(self.last_frame,
+                                (int(np.shape(self.last_frame)[1] * scale), int(np.shape(self.last_frame)[0] * scale)))
+        return scaled
     def acquire_movie(self, num_frames):
         movie = []
         for _ in range(num_frames):
